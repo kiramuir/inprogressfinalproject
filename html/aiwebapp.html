@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: white;
+        }
+        canvas {
+            background-color: #2e2e2e;
+            display: block;
+            border: 2px solid #ffffff;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+
+        // Game variables
+        let tileSize = 20;
+        let snake = [{ x: 200, y: 200 }];
+        let direction = { x: 0, y: 0 };
+        let food = { x: 100, y: 100 };
+        let score = 0;
+
+        // Randomize food position
+        function generateFood() {
+            food.x = Math.floor(Math.random() * (canvas.width / tileSize)) * tileSize;
+            food.y = Math.floor(Math.random() * (canvas.height / tileSize)) * tileSize;
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Move snake
+            const head = { x: snake[0].x + direction.x * tileSize, y: snake[0].y + direction.y * tileSize };
+            snake.unshift(head);
+
+            // Check if snake eats food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreDisplay.textContent = `Score: ${score}`;
+                generateFood();
+            } else {
+                snake.pop(); // Remove tail
+            }
+
+            // Check collision with walls or self
+            if (
+                head.x < 0 || head.x >= canvas.width ||
+                head.y < 0 || head.y >= canvas.height ||
+                snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+            ) {
+                alert('Game Over! Your score: ' + score);
+                document.location.reload();
+            }
+
+            draw();
+        }
+
+        // Draw game elements
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, tileSize, tileSize);
+
+            // Draw snake
+            ctx.fillStyle = 'lime';
+            snake.forEach(segment => ctx.fillRect(segment.x, segment.y, tileSize, tileSize));
+        }
+
+        // Handle keypress
+        document.addEventListener('
